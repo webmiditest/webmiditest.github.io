@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+	<title>snake.jpg</title>
+    <script src='https://cwilso.github.com/WebMIDIAPIShim/lib/WebMIDIAPI.js'></script>
+
+	<script>
+	var context = midiAccess = midiIn = midiOut = null,
+		numRows = numCols = 8;
+	window.addEventListener('load', function() {
+		navigator.requestMIDIAccess({}).then(onMIDIInit, onMIDIReject);
+		T = 0;
+
+	function G() {function q(a, b) {return a[0] == b[0] && a[1] == b[1]}function l(a) {return a[a.length - 1]}function R() {with(Math) return [floor(8 * random()), floor(8 * random())]}d = [1, 0], s = [[0, 0],[1, 0]], f = [2, 2], onkeydown = function(a) {w = a.which, t = w > 36 && 41 > w ? w % 2 ? [w - 38, 0] : [0, w - 39] : d, d = q([-1 * d[0], -1 * d[1]], t) ? d : t};if (!T) T = setInterval(function() {midiOut.send([0xb0, 0x00, 0x00]),midiOut.send([0x90, f[1] * 16 + f[0], 0x13]), _ = l(s); for (i in s) e = s[i],midiOut.send([0x90, e[1] * 16 + e[0], 0x3C]), i < s.length - 1 && q(_, e) ? G() : 0; q(_, f) ? f = R() : s.shift(), s.push([l(s)[0] + d[0], l(s)[1] + d[1]]), h = l(s), h[0] == -1 || h[1] == -1 || h[0] == 8 || h[1] == 8 ? G() : 0}, 200)}
+	G()
+	});
+
+function onMIDIInit(midi) {
+	midiAccess = midi;
+	for (var output of midiAccess.outputs.values()) {midiOut = output;}
+	for (var input of midiAccess.inputs.values()) {midiIn = input;}
+	midiIn.onmidimessage = midiProc;
+}
+
+function onMIDIReject(err) {
+}
+
+function midiProc(event) {
+}
+	</script>
+</html>

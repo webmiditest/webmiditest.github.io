@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+  <head>
+    <title>TetrisPad</title>
+    <link rel="shortcut icon" href="assets/favicon.png">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0" />
+    <meta name="theme-color" content="#21252B">
+  </head>
+
+  <body>
+      <h2 class="prompt" id="prompt"></h2>
+
+
+    <!-- Le scripts -->
+    <script>
+      // Minimal setup and cheap ES6 detection error
+      var prompt = document.getElementById('prompt')
+      window.onerror = function() {
+        prompt.textContent = 'Ouch! Your browser is not compatible. Please use Chrome.';
+      };
+    </script>
+    <script src="scripts/Launchpad.js"></script>
+    <script src="scripts/Grid.js"></script>
+    <script src="scripts/Game.js"></script>
+    <script src="scripts/Controller.js"></script>
+    <script>
+      var myLaunchpad = new Launchpad(),
+          myController = new Controller(),
+          theGame
+
+      // Ask MIDI API access
+      navigator
+        .permissions.query({name:'geolocation'})
+        .then(e => {
+          if (e.state !== 'granted')
+            navigator.requestMIDIAccess({sysex:true})
+        })
+
+      // Setup sequence
+      function setup () {
+        myLaunchpad
+          .accessDevice()
+          .then(() => {
+            myController.addLaunchpad(myLaunchpad)
+            theGame = new Game(
+              myController,
+              800
+            )
+            prompt.textContent = 'Press enter (or the yellow key) to start'
+          },
+          () => {
+            prompt.textContent = 'Cannot find your Launchpad. Please plug it and press enter (or refresh).'
+          })
+      }
+
+      // Listen for user input
+      myController.onKey(e => {
+        if (!e.start)
+          return
+
+        if (theGame) {
+          theGame.stop();
+          theGame.init()
+          theGame.start()
+          prompt.textContent = 'GO! (press enter/yellow key to reset)'
+        }
+        else {
+          setup()
+        }
+      })
+
+      // GO!
+      setup();
+
+
+      // Back to normal
+      window.onerror = (e) => {
+        prompt.textContent = 'Somethin bad happen. JavaScript dropped the mic.'
+      }
+    </script>
+
+    <style>
+      html, body {
+        font-family: 'Andale Mono', monospace;
+        margin: 0;
+        padding: 0;
+        background: #21252B;
+        color: #fff;
+      }
+      body {
+        display: flex;
+        max-width: 1000px;
+      }
+      a {
+        color: inherit;
+      }
+      p {
+        line-height: 1.5;
+      }
+      .pre {
+        background-color: #3c424e;
+        padding: 0 .25em .25em;
+        border-radius: 2px;
+      }
+
+      .intro, .info {
+        margin: 1rem;
+      }
+      .intro {
+        max-width: 350px;
+      }
+      .intro img {
+        width: 65%;
+      }
+      .prompt {
+        color: #21252B;
+        background-color: #fff;
+        padding: .5em;
+      }
+
+      @media (max-width: 680px) {
+        body {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </body>
+</html>
